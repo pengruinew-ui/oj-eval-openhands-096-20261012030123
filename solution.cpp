@@ -5,48 +5,34 @@
 #include <string>
 using namespace std;
 
-struct TreeNode {
-    int val;
-    TreeNode* left;
-    TreeNode* right;
-    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
-};
-
 class Solution {
 private:
-    TreeNode* root;
     unordered_map<int, pair<int, int>> nodeInfo; // val -> {depth, parent_val}
     
-    // Build tree from preorder traversal
-    TreeNode* buildTree(const vector<int>& preorder, int& index) {
-        if (index >= (int)preorder.size() || preorder[index] == -1) {
-            index++;
-            return nullptr;
+    // Build tree from preorder traversal and record node information
+    void buildAndRecord(const vector<int>& preorder, int& index, int depth, int parent_val) {
+        if (index >= (int)preorder.size()) return;
+        
+        int val = preorder[index];
+        index++;
+        
+        if (val == -1) {
+            // Null node, don't record anything
+            return;
         }
         
-        TreeNode* node = new TreeNode(preorder[index]);
-        index++;
-        node->left = buildTree(preorder, index);
-        node->right = buildTree(preorder, index);
-        return node;
-    }
-    
-    // DFS to record depth and parent information
-    void recordNodeInfo(TreeNode* node, int depth, int parent_val) {
-        if (!node) return;
+        // Record this node's information
+        nodeInfo[val] = {depth, parent_val};
         
-        nodeInfo[node->val] = {depth, parent_val};
-        recordNodeInfo(node->left, depth + 1, node->val);
-        recordNodeInfo(node->right, depth + 1, node->val);
+        // Recursively build left and right subtrees
+        buildAndRecord(preorder, index, depth + 1, val);
+        buildAndRecord(preorder, index, depth + 1, val);
     }
     
 public:
     Solution(const vector<int>& preorder) {
         int index = 0;
-        root = buildTree(preorder, index);
-        if (root) {
-            recordNodeInfo(root, 0, -1); // root has parent -1
-        }
+        buildAndRecord(preorder, index, 0, -1);
     }
     
     bool areCousins(int x, int y) {
