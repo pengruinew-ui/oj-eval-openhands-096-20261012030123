@@ -1,8 +1,8 @@
 #include <iostream>
 #include <vector>
-#include <queue>
 #include <sstream>
 #include <unordered_map>
+#include <string>
 using namespace std;
 
 struct TreeNode {
@@ -19,7 +19,7 @@ private:
     
     // Build tree from preorder traversal
     TreeNode* buildTree(const vector<int>& preorder, int& index) {
-        if (index >= preorder.size() || preorder[index] == -1) {
+        if (index >= (int)preorder.size() || preorder[index] == -1) {
             index++;
             return nullptr;
         }
@@ -44,10 +44,16 @@ public:
     Solution(const vector<int>& preorder) {
         int index = 0;
         root = buildTree(preorder, index);
-        recordNodeInfo(root, 0, -1); // root has parent -1
+        if (root) {
+            recordNodeInfo(root, 0, -1); // root has parent -1
+        }
     }
     
     bool areCousins(int x, int y) {
+        // If nodes are the same, they can't be cousins
+        if (x == y) return false;
+        
+        // Check if both nodes exist
         if (nodeInfo.find(x) == nodeInfo.end() || nodeInfo.find(y) == nodeInfo.end()) {
             return false;
         }
@@ -77,13 +83,13 @@ int main() {
     string line;
     
     // Read number of queries
-    getline(cin, line);
+    if (!getline(cin, line)) return 0;
     int q = stoi(line);
     
     // Read queries
     vector<pair<int, int>> queries;
     for (int i = 0; i < q; i++) {
-        getline(cin, line);
+        if (!getline(cin, line)) break;
         vector<int> nums = parseLine(line);
         if (nums.size() >= 2) {
             queries.push_back({nums[0], nums[1]});
@@ -91,7 +97,7 @@ int main() {
     }
     
     // Read tree preorder traversal
-    getline(cin, line);
+    if (!getline(cin, line)) return 0;
     vector<int> preorder = parseLine(line);
     
     // Create solution and process queries
